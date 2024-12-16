@@ -1,9 +1,11 @@
-use redis::AsyncCommands;
-use redis::Client;
+use redis::{AsyncCommands, Client};
+use std::env;
 
 #[tokio::main]
 async fn main() -> redis::RedisResult<()> {
-    let client = Client::open("redis://127.0.0.1/")?;
+    let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "redis://127.0.0.1/".to_string());
+
+    let client = Client::open(redis_url)?;
 
     let publisher_client = client.clone();
     publish_messages(publisher_client, "my_channel").await?;
