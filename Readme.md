@@ -5,6 +5,7 @@
 - `kafka`
 - `rabbitmq`
 - `pulsar`
+- `redis pub-sub`
 - `prometheus-grafana`
 - `elk stack`
 
