@@ -3,10 +3,18 @@ version: '3.8'
 services:
   rabbitmq:
     image: rabbitmq:latest
-    container_name: rabbitmq
+    container_name: rabbitmq-stream
     ports:
       - "5672:5672" # RabbitMQ messaging port
       - "15672:15672" # RabbitMQ Management UI port
+      - "5552:5552" # RabbitMQ Stream plugin port
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_stream advertised_host localhost" # Stream-specific configuration
+      RABBITMQ_STREAM_MAX_QUEUE_SIZE: 5000000000
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
