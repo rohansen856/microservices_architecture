@@ -1,0 +1,10 @@
+[package]
+name = "redis-pub-sub-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+futures = "0.3.31"
+redis = { version = "0.27.6", features = ["aio", "tokio-comp"] }
+tokio = { version = "1.42.0", features = ["full"] }
+tokio-stream = "0.1.17"
