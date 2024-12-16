@@ -1,10 +1,20 @@
+use std::env;
+
 use rabbitmq_stream_client::error::StreamCreateError;
 use rabbitmq_stream_client::types::{ByteCapacity, Message, ResponseCode};
+use rabbitmq_stream_client::Environment;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    use rabbitmq_stream_client::Environment;
-    let environment = Environment::builder().build().await?;
+    let username = env::var("RABBITMQ_USERNAME").unwrap_or_else(|_| "admin".to_string());
+    let password = env::var("RABBITMQ_PASSWORD").unwrap_or_else(|_| "admin".to_string());
+    
+    let environment = Environment::builder()
+        .username(&username)
+        .password(&password)
+        .build()
+        .await?;
+
     let stream = "hello-rust-stream";
     let create_response = environment
         .stream_creator()
