@@ -1,58 +1,62 @@
 version: '3.8'
+
 services:
   neo4j:
     image: neo4j:latest
-    container_name: neo4j
-    restart: unless-stopped
+    container_name: neo4j_instance
     ports:
-      - "7474:7474" # HTTP Browser
-      - "7687:7687" # Bolt protocol
-    environment:
-      # Admin credentials
-      - NEO4J_AUTH=neo4j/your_secure_password_here
-
-      # Enable remote connections (be cautious; restrict access for production)
-      - NEO4J_dbms_default__listen__address=0.0.0.0
-      - NEO4J_dbms_default__advertised__address=localhost
-
-      # Performance optimizations
-      - NEO4J_dbms_memory_pagecache_size=1G
-      - NEO4J_dbms_memory_heap_initial__size=2G
-      - NEO4J_dbms_memory_heap_max__size=2G
-
-      # Logging configuration
-      - NEO4J_dbms_logs_debug_level=INFO
-
-      # Optional: Enable APOC library
-      - NEO4JLABS_PLUGINS=["apoc"]
-
-      # Optional: Enable Bloom (Graph Visualization Tool)
-      - NEO4JLABS_PLUGINS=["bloom"]
-
-      # Configure backups (use external backup service)
-      - NEO4J_dbms_backup_enabled=true
-
-      # Enable metrics for monitoring (Prometheus compatible)
-      - NEO4J_dbms_metrics_enabled=true
-
+      # Bolt protocol port
+      - "7687:7687"
+      # HTTP port
+      - "7474:7474"
+      # HTTPS port
+      - "7473:7473"
     volumes:
+      # Data persistence
       - neo4j_data:/data
-      - neo4j_logs:/logs
-      - neo4j_import:/import
+      # Database dumps and imports
+      - neo4j_imports:/var/lib/neo4j/import
+      # Database backups
+      - neo4j_backups:/backups
+      # Plugins directory
       - neo4j_plugins:/plugins
+      # Logs directory
+      - neo4j_logs:/logs
+    environment:
+      # Accept license agreement
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      # Initial password for neo4j user
+      - NEO4J_AUTH=neo4j/password
+      # Memory settings
+      - NEO4J_dbms_memory_heap_initial__size=1G
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
+      # Enable GDS library
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*
+      # Enable APOC
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*
+      # Enable remote connections
+      - NEO4J_server_default__listen__address=0.0.0.0
+      # Configure logging
+      - NEO4J_dbms_logs_debug_level=INFO
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
     networks:
       - neo4j_network
+
+volumes:
+  neo4j_data:
+  neo4j_imports:
+  neo4j_backups:
+  neo4j_plugins:
+  neo4j_logs:
+
 
 networks:
   neo4j_network:
     driver: bridge
-
-volumes:
-  neo4j_data:
-    driver: local
-  neo4j_logs:
-    driver: local
-  neo4j_import:
-    driver: local
-  neo4j_plugins:
-    driver: local
