@@ -6,6 +6,9 @@
 - `rabbitmq`
 - `pulsar`
 - `redis pub-sub`
+- `neo4j`
+- `postgres`
+- `mongodb`
 - `prometheus-grafana`
 - `elk stack`
 
