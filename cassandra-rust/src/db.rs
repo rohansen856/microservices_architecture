@@ -1,4 +1,3 @@
-// src/db.rs
 use cassandra_cpp::{AsRustType, Cluster, LendingIterator, Session};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;

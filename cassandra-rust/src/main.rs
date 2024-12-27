@@ -1,5 +1,4 @@
 
-// src/main.rs
 mod db;
 
 use actix_web::{web, App, HttpResponse, HttpServer};
