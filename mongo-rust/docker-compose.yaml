@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: no
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-secretpassword}
+      MONGO_INITDB_DATABASE: ${MONGO_INITIAL_DATABASE:-mydatabase}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - mongodb_network
+    command: [ "--auth", "--bind_ip_all" ]
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+
+volumes:
+  mongodb_data:
+    name: mongodb_data
+  mongodb_config:
+    name: mongodb_config
+
+networks:
+  mongodb_network:
+    driver: bridge
+    name: mongodb_network
