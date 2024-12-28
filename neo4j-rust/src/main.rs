@@ -1,50 +1,12 @@
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use neo4rs::{Graph, Query};
-use serde::{Deserialize, Serialize};
 use dotenv::dotenv;
 use std::env;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use std::sync::Arc;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Todo {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<i64>,
-    title: String,
-    description: String,
-    status: TodoStatus,
-    #[serde(default = "Utc::now")]
-    created_at: DateTime<Utc>,
-    #[serde(default = "Utc::now")]
-    updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum TodoStatus {
-    Pending,
-    InProgress,
-    Completed,
-}
-
-impl TodoStatus {
-    fn as_str(&self) -> &'static str {
-        match self {
-            TodoStatus::Pending => "PENDING",
-            TodoStatus::InProgress => "IN_PROGRESS",
-            TodoStatus::Completed => "COMPLETED",
-        }
-    }
-
-    fn from_str(s: &str) -> Result<Self, String> {
-        match s {
-            "PENDING" => Ok(TodoStatus::Pending),
-            "IN_PROGRESS" => Ok(TodoStatus::InProgress),
-            "COMPLETED" => Ok(TodoStatus::Completed),
-            _ => Err(format!("Invalid status: {}", s)),
-        }
-    }
-}
+mod todo;
+use todo::{Todo, TodoStatus};
 
 struct AppState {
     graph: Arc<Graph>,
@@ -208,8 +170,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(AppState {
                 graph: graph.clone(),
             }))
-            .route("/todos", web::get().to(get_todos))
-            .route("/todos/{id}", web::get().to(get_todo_by_id))
+            .route("/todo", web::get().to(get_todos))
+            .route("/todo/{id}", web::get().to(get_todo_by_id))
             .route("/todo", web::post().to(create_todo))
     })
     .bind((host, port))?
