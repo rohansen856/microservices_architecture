@@ -1,0 +1,14 @@
+[package]
+name = "mongo-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.4"
+mongodb = "2.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+futures = "0.3"
+dotenv = "0.15"
+bson = { version = "2.8", features = ["chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
