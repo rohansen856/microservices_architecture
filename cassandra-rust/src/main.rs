@@ -76,9 +76,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(state.clone())
-            .route("/get", web::get().to(get_todos))
-            .route("/get/{id}", web::get().to(get_todo_by_id))
-            .route("/post", web::post().to(create_todo))
+            .route("/todo", web::get().to(get_todos))
+            .route("/todo/{id}", web::get().to(get_todo_by_id))
+            .route("/todo", web::post().to(create_todo))
             .route("/patch/{id}", web::patch().to(update_todo))
     })
     .bind("127.0.0.1:8080")?
